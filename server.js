@@ -308,6 +308,10 @@ Server.prototype = new function () {
       );
 
     if (request.method != 'HEAD' && request.method != 'GET') {
+      if (next) {
+        console.log('fucking yajsml is a fucking fuck');
+        return next();
+      }
       // I don't know how to do this.
       response.writeHead(405, {
         'allow': 'HEAD, GET'
