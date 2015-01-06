@@ -25,6 +25,7 @@
 var crypto = require('crypto');
 var fs = require('fs');
 var urlutil = require('url');
+var pathutil = require('path');
 var requestURI = require('./request').requestURI;
 var requestURIs = require('./request').requestURIs;
 
@@ -38,17 +39,15 @@ function hasOwnProperty(o, k) {
 function relativePath(path, rootPath) {
   var pathSplit = path.split('/');
   var rootSplit = rootPath.split('/');
-  var relative;
-  var i = 0;
-  while (pathSplit[i] == rootSplit[i]) {
-    i++;
-  }
-  if (i < rootSplit.length - 1) {
-    relative = (new Array(rootSplit.length - i)).join('../');
-  } else {
-    relative = ''; // perhaps './'?
-  }
-  return  relative + pathSplit.slice(i).join('/');
+  var pathPart;
+  var rootPart;
+  while ((pathPart = pathSplit.shift()) == (rootPart = rootSplit.shift())) {;}
+
+  return pathutil.join(
+    (new Array(rootSplit.length+1)).join('../')
+  , pathPart
+  , pathSplit.join('/')
+  );
 }
 
 // Normal `path.normalize` uses backslashes on Windows, so this is a custom
@@ -271,12 +270,6 @@ function Server(options) {
   if (options.baseURI) {
     this._baseURI = trailingSlash(options.baseURI);
   }
-
-  // Some clients insist on transforming values, but cannot run transformation
-  // on a separate service. This enables a workaround #hack.
-  if (options.requestURIs) {
-    this._requestURIs = options.requestURIs;
-  }
 }
 Server.prototype = new function () {
   function _resourceURIForModulePath(path) {
@@ -292,8 +285,6 @@ Server.prototype = new function () {
   }
 
   function handle(request, response, next) {
-    var requestURIs = this._requestURIs || requestURIs; // Hack, see above.
-
     var url = require('url').parse(request.url, true);
     var path = normalizePath(url.pathname);
 
