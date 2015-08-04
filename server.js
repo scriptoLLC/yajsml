@@ -213,10 +213,7 @@ function packagedDefine(JSONPCallback, moduleMap) {
 }
 
 function notModified(requestHeaders, responseHeaders) {
-  var lastModified = Date.parse(responseHeaders['last-modified']);
-  var modifiedSince = Date.parse(requestHeaders['if-modified-since']);
-  return ((requestHeaders['etag'] && requestHeaders['etag'] == responseHeaders['etag'])
-      || (lastModified && lastModified <= modifiedSince));
+  return false;
 }
 
 /*
