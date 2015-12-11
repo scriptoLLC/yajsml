@@ -1,5 +1,5 @@
 {
-  "name": "yajsml-scripto-llc",
+  "name": "@scriptollc/yajsml",
   "description": "Yet another (Common)JS module loader.",
   "keywords": [
     "commonjs",
